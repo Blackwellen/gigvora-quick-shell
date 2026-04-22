@@ -57,6 +57,7 @@
     "hls.js": "^1.6.16",
     "input-otp": "^1.4.2",
     "ioredis": "^5.4.1",
+    "lovable-tagger": "^1.1.13",
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
     "pg": "^8.13.0",
