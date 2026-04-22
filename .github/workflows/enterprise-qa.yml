@@ -1,0 +1,164 @@
+name: Enterprise QA Matrix
+
+# Group 6 — Cross-cutting CI gate.
+#
+# Runs the full enterprise QA matrix every time code lands on main or in a PR:
+#   • ml-python    pytest (Group 1 contract: 4-state + payload guard + metrics)
+#   • analytics-python pytest (Group 3 contract: same shape, separate registry)
+#   • api-nest     Jest unit + service tests (Group 2 contract: MlClient retries,
+#                  fallback, audit, idempotency)
+#   • frontend     Playwright `enterprise-matrix.spec.ts` — every primary route
+#                  must reach a terminal state (Group 4)
+#   • mobile       Flutter `flutter test` — AsyncStateView widget matrix +
+#                  OfflineCache TTL contract (Group 5)
+#   • load         k6 smoke against ml-python + analytics-python (non-blocking
+#                  thresholds documented in slo-*.md)
+#
+# All matrix jobs are required-status-checks. A red job blocks merge.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: enterprise-qa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Group 1 — ML Python service
+  # ---------------------------------------------------------------------------
+  ml-python:
+    name: ml-python · pytest
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: apps/ml-python } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13", cache: "pip" }
+      - run: pip install -e .[dev] || pip install -e .
+      - run: pip install pytest httpx fastapi structlog prometheus-client pydantic
+      - name: Run enterprise QA matrix
+        run: pytest -q tests/
+
+  # ---------------------------------------------------------------------------
+  # Group 3 — Analytics Python service
+  # ---------------------------------------------------------------------------
+  analytics-python:
+    name: analytics-python · pytest
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: apps/analytics-python } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13", cache: "pip" }
+      - run: pip install -e .[dev] || pip install -e .
+      - run: pip install pytest httpx fastapi structlog prometheus-client pydantic
+      - name: Run enterprise QA matrix
+        run: pytest -q tests/
+
+  # ---------------------------------------------------------------------------
+  # Group 2 — NestJS bridge services
+  # ---------------------------------------------------------------------------
+  api-nest:
+    name: api-nest · jest
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: apps/api-nest } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20", cache: "npm", cache-dependency-path: apps/api-nest/package-lock.json }
+      - run: npm ci || npm install
+      - run: npm test -- --ci --reporters=default
+
+  # ---------------------------------------------------------------------------
+  # Group 4 — Frontend Playwright matrix
+  # ---------------------------------------------------------------------------
+  frontend-playwright:
+    name: frontend · playwright enterprise-matrix
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20", cache: "npm" }
+      - run: npm ci || npm install
+      - run: npx playwright install --with-deps chromium
+      - name: Build app
+        run: npm run build
+      - name: Start preview + run enterprise matrix
+        run: |
+          npx vite preview --port 4173 &
+          PREVIEW_PID=$!
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:4173 > /dev/null && break || sleep 2
+          done
+          PLAYWRIGHT_BASE_URL=http://localhost:4173 \
+            npx playwright test tests/playwright/enterprise-matrix.spec.ts --reporter=line
+          kill $PREVIEW_PID || true
+
+  # ---------------------------------------------------------------------------
+  # Group 5 — Mobile Flutter
+  # ---------------------------------------------------------------------------
+  mobile-flutter:
+    name: mobile-flutter · flutter test
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: apps/mobile-flutter } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: "stable", cache: true }
+      - run: flutter pub get
+      - name: Run widget + cache contract tests
+        run: flutter test --reporter expanded
+
+  # ---------------------------------------------------------------------------
+  # k6 smoke (non-blocking thresholds — informational by default)
+  # ---------------------------------------------------------------------------
+  k6-smoke:
+    name: k6 · smoke (ml + analytics)
+    runs-on: ubuntu-latest
+    needs: [ml-python, analytics-python]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.13" }
+      - name: Install grafana/k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
+            --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" \
+            | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update && sudo apt-get install -y k6
+      - name: Boot ml-python + run k6
+        working-directory: apps/ml-python
+        run: |
+          pip install -e . uvicorn fastapi structlog prometheus-client pydantic httpx
+          uvicorn app.main:app --port 8001 &
+          for i in $(seq 1 30); do curl -sf http://localhost:8001/health > /dev/null && break || sleep 1; done
+          k6 run --quiet ../../tests/load/ml-python.js || echo "::warning::k6 ml-python thresholds not met"
+      - name: Boot analytics-python + run k6
+        working-directory: apps/analytics-python
+        run: |
+          pip install -e . uvicorn fastapi structlog prometheus-client pydantic httpx
+          uvicorn app.main:app --port 8002 &
+          for i in $(seq 1 30); do curl -sf http://localhost:8002/health > /dev/null && break || sleep 1; done
+          k6 run --quiet ../../tests/load/analytics-python.js || echo "::warning::k6 analytics-python thresholds not met"
+
+  # ---------------------------------------------------------------------------
+  # Aggregate gate — required check on PRs
+  # ---------------------------------------------------------------------------
+  enterprise-qa-gate:
+    name: Enterprise QA Gate
+    runs-on: ubuntu-latest
+    needs:
+      - ml-python
+      - analytics-python
+      - api-nest
+      - frontend-playwright
+      - mobile-flutter
+    steps:
+      - run: echo "All Group 1–5 enterprise QA suites passed."

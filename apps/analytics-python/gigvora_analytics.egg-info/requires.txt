@@ -1,0 +1,13 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.8
+pandas>=2.2
+numpy>=2.0
+duckdb>=1.1
+asyncpg>=0.29
+structlog>=24.4
+prometheus-client>=0.20
+
+[dev]
+pytest>=8.3
+ruff>=0.6

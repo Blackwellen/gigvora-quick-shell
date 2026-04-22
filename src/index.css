@@ -1,0 +1,296 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 20% 98%;
+    --foreground: 220 30% 14%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 30% 14%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 30% 14%;
+
+    --primary: 199 78% 46%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 214 20% 94%;
+    --secondary-foreground: 220 30% 14%;
+
+    --muted: 214 20% 94%;
+    --muted-foreground: 220 10% 46%;
+
+    --accent: 199 89% 48%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214 20% 90%;
+    --input: 214 20% 90%;
+    --ring: 199 89% 48%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5% 26%;
+    --sidebar-primary: 199 78% 46%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 199 78% 46%;
+
+    /* Gigvora custom tokens */
+    --gigvora-navy: 221 83% 24%;
+    --gigvora-navy-light: 221 60% 35%;
+    --gigvora-blue: 199 89% 48%;
+    --gigvora-blue-light: 199 89% 65%;
+    --gigvora-teal: 174 72% 46%;
+    --gigvora-green: 152 69% 41%;
+    --gigvora-amber: 38 92% 50%;
+    --gigvora-red: 0 84% 60%;
+    --gigvora-purple: 262 83% 58%;
+    --gigvora-surface: 210 20% 98%;
+    --gigvora-surface-raised: 0 0% 100%;
+    --gigvora-overlay: 221 83% 24% / 0.5;
+
+    /* Enterprise state semantics */
+    --state-healthy: 152 69% 41%;
+    --state-caution: 38 92% 50%;
+    --state-blocked: 0 84% 60%;
+    --state-degraded: 25 95% 53%;
+    --state-review: 262 83% 58%;
+    --state-live: 152 69% 41%;
+    --state-premium: 199 89% 48%;
+    --state-pending: 214 20% 60%;
+
+    /* Layout dimensions */
+    --topbar-height: 3.25rem;
+    --megamenu-height: 2.5rem;
+    --dashboard-tabs-height: 2.5rem;
+
+    /* Shell gutters — product-family aware */
+    --shell-gutter: clamp(1.5rem, 4vw, 3.5rem);
+    --shell-gutter-tight: clamp(1rem, 2.5vw, 2rem);
+    --shell-gutter-wide: clamp(2rem, 5vw, 5rem);
+
+    /* Max-widths per product family */
+    --public-max-width: 1280px;
+    --content-max-width: 1440px;
+    --admin-max-width: 1600px;
+    --marketplace-max-width: 1400px;
+    --studio-max-width: 1520px;
+    --conversation-max-width: 1200px;
+    --media-max-width: 1920px;
+    --recruiting-max-width: 1480px;
+    --org-max-width: 1440px;
+
+    /* Card radii — softer defaults */
+    --card-radius: 1.25rem;
+    --card-radius-lg: 1.5rem;
+    --card-radius-xl: 2rem;
+
+    /* Rail widths */
+    --nav-rail-width: 13rem;
+    --nav-rail-collapsed: 3.5rem;
+    --right-rail-width: 20rem;
+    --right-rail-gap: 1.5rem;
+  }
+
+  .dark {
+    --background: 222 47% 6%;
+    --foreground: 210 40% 98%;
+
+    --card: 222 47% 8%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 8%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 199 89% 48%;
+    --primary-foreground: 222 47% 6%;
+
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 199 89% 48%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 199 89% 48%;
+
+    --sidebar-background: 222 47% 8%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-primary: 199 89% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 199 89% 48%;
+
+    --gigvora-navy: 221 60% 35%;
+    --gigvora-surface: 222 47% 6%;
+    --gigvora-surface-raised: 222 47% 8%;
+
+    --state-healthy: 152 69% 50%;
+    --state-caution: 38 92% 55%;
+    --state-blocked: 0 84% 55%;
+    --state-degraded: 25 95% 58%;
+    --state-review: 262 83% 65%;
+    --state-live: 152 69% 50%;
+    --state-premium: 199 89% 55%;
+    --state-pending: 214 20% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-feature-settings: 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.011em;
+    font-size: 13px;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+    @apply tracking-tight;
+  }
+  h1 { @apply text-2xl font-bold; letter-spacing: -0.025em; }
+  h2 { @apply text-xl font-semibold; letter-spacing: -0.02em; }
+  h3 { @apply text-lg font-semibold; letter-spacing: -0.015em; }
+}
+
+@layer utilities {
+  /* Premium shadow system */
+  .shadow-card {
+    box-shadow: 0 1px 3px 0 hsl(var(--foreground) / 0.04), 0 1px 2px -1px hsl(var(--foreground) / 0.04);
+  }
+  .shadow-card-hover {
+    box-shadow: 0 6px 16px -3px hsl(var(--foreground) / 0.09), 0 3px 8px -3px hsl(var(--foreground) / 0.05);
+  }
+  .shadow-elevated {
+    box-shadow: 0 10px 30px -6px hsl(var(--foreground) / 0.12), 0 6px 16px -6px hsl(var(--foreground) / 0.08);
+  }
+  /* Glass effect */
+  .glass {
+    backdrop-filter: blur(16px) saturate(180%);
+    background: hsl(var(--card) / 0.82);
+  }
+
+  /* ── Social-product micro-interactions ── */
+
+  /* Hover lift for cards and interactive surfaces */
+  .hover-lift {
+    @apply transition-all duration-300 ease-out;
+  }
+  .hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px -5px hsl(var(--foreground) / 0.12), 0 4px 10px -4px hsl(var(--foreground) / 0.07);
+  }
+  .hover-lift:active {
+    transform: translateY(-1px);
+    transition-duration: 100ms;
+  }
+
+  /* Feed card entrance animation */
+  .feed-card {
+    @apply animate-fade-up;
+    animation-fill-mode: both;
+  }
+  .feed-card:nth-child(1) { animation-delay: 0ms; }
+  .feed-card:nth-child(2) { animation-delay: 50ms; }
+  .feed-card:nth-child(3) { animation-delay: 100ms; }
+  .feed-card:nth-child(4) { animation-delay: 150ms; }
+  .feed-card:nth-child(5) { animation-delay: 200ms; }
+  .feed-card:nth-child(6) { animation-delay: 250ms; }
+  .feed-card:nth-child(7) { animation-delay: 300ms; }
+  .feed-card:nth-child(8) { animation-delay: 350ms; }
+
+  /* CTA glow emphasis */
+  .cta-glow {
+    @apply animate-glow-pulse;
+  }
+
+  /* Interactive chip with slide feel */
+  .chip-interactive {
+    @apply transition-all duration-200 ease-out rounded-full;
+  }
+  .chip-interactive:hover {
+    transform: translateY(-1px) scale(1.03);
+    box-shadow: 0 2px 8px -2px hsl(var(--foreground) / 0.08);
+  }
+  .chip-interactive:active {
+    transform: scale(0.97);
+  }
+
+  /* Enterprise state badges */
+  .state-healthy { color: hsl(var(--state-healthy)); }
+  .state-caution { color: hsl(var(--state-caution)); }
+  .state-blocked { color: hsl(var(--state-blocked)); }
+  .state-degraded { color: hsl(var(--state-degraded)); }
+  .state-review { color: hsl(var(--state-review)); }
+  .state-live { color: hsl(var(--state-live)); }
+  .state-premium { color: hsl(var(--state-premium)); }
+  .state-pending { color: hsl(var(--state-pending)); }
+
+  .bg-state-healthy { background-color: hsl(var(--state-healthy) / 0.1); }
+  .bg-state-caution { background-color: hsl(var(--state-caution) / 0.1); }
+  .bg-state-blocked { background-color: hsl(var(--state-blocked) / 0.1); }
+  .bg-state-review { background-color: hsl(var(--state-review) / 0.1); }
+  .bg-state-premium { background-color: hsl(var(--state-premium) / 0.1); }
+  .bg-state-pending { background-color: hsl(var(--state-pending) / 0.1); }
+
+  /* Dense professional spacing */
+  .dense-row {
+    @apply py-1.5 px-3 text-xs;
+  }
+  .dense-label {
+    @apply text-[11px] font-medium uppercase tracking-wider text-muted-foreground;
+  }
+
+  /* Mobile safe area for bottom nav */
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Card interactive surface */
+  .card-interactive {
+    @apply rounded-2xl border bg-card transition-all duration-200 ease-out cursor-pointer;
+  }
+  .card-interactive:hover {
+    @apply shadow-card-hover border-accent/25;
+    transform: translateY(-1px);
+  }
+
+  /* Countdown / live indicator */
+  .live-dot {
+    @apply h-2 w-2 rounded-full bg-[hsl(var(--state-live))];
+    animation: live-pulse 2s ease-in-out infinite;
+  }
+  @keyframes live-pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 hsl(var(--state-live) / 0.4); }
+    50% { opacity: 0.8; box-shadow: 0 0 0 4px hsl(var(--state-live) / 0); }
+  }
+
+  /* Stacked avatars */
+  .avatar-stack > * {
+    @apply -ml-2 first:ml-0 ring-2 ring-background;
+  }
+}

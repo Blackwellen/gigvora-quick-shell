@@ -1,0 +1,32 @@
+{
+  "name": "@gigvora/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./booking": "./src/booking.ts",
+    "./calls": "./src/calls.ts",
+    "./groups": "./src/groups.ts",
+    "./inbox": "./src/inbox.ts",
+    "./interview-planning": "./src/interview-planning.ts",
+    "./job-application-flow": "./src/job-application-flow.ts",
+    "./job-posting-studio": "./src/job-posting-studio.ts",
+    "./jobs-browse": "./src/jobs-browse.ts",
+    "./recruiter-job-management": "./src/recruiter-job-management.ts",
+    "./trust": "./src/trust.ts",
+    "./webhooks": "./src/webhooks.ts",
+    "./webinars": "./src/webinars.ts",
+    "./candidate-availability-matching": "./src/candidate-availability-matching.ts",
+    "./projects-browse-discovery": "./src/projects-browse-discovery.ts",
+    "./project-posting-smart-match": "./src/project-posting-smart-match.ts",
+    "./proposal-builder-bid-credits": "./src/proposal-builder-bid-credits.ts",
+    "./proposal-review-award": "./src/proposal-review-award.ts",
+    "./contracts-sow-acceptance": "./src/contracts-sow-acceptance.ts",
+    "./project-workspaces-handover": "./src/project-workspaces-handover.ts"
+  },
+  "dependencies": { "zod": "^3.23.8" },
+  "devDependencies": { "typescript": "^5.6.0" }
+}

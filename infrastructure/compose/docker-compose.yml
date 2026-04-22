@@ -1,0 +1,74 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: gigvora
+      POSTGRES_PASSWORD: gigvora
+      POSTGRES_DB: gigvora
+    ports: ['5432:5432']
+    volumes: ['pgdata:/var/lib/postgresql/data']
+
+  redis:
+    image: redis:7-alpine
+    ports: ['6379:6379']
+
+  opensearch:
+    image: opensearchproject/opensearch:2.15.0
+    environment:
+      - discovery.type=single-node
+      - DISABLE_SECURITY_PLUGIN=true
+      - bootstrap.memory_lock=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+    ports: ['9200:9200']
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: gigvora
+      MINIO_ROOT_PASSWORD: gigvora-secret
+    ports: ['9000:9000', '9001:9001']
+    volumes: ['miniodata:/data']
+
+  api-nest:
+    build: ../../apps/api-nest
+    environment:
+      DATABASE_URL: postgres://gigvora:gigvora@postgres:5432/gigvora
+      REDIS_URL: redis://redis:6379
+      OPENSEARCH_URL: http://opensearch:9200
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: gigvora-media
+      S3_ACCESS_KEY: gigvora
+      S3_SECRET_KEY: gigvora-secret
+      JWT_SECRET: change-me-change-me-change-me-1234
+    ports: ['3001:3001']
+    depends_on: [postgres, redis, opensearch, minio]
+
+  ml-python:
+    build: ../../apps/ml-python
+    ports: ['8001:8000']
+    depends_on: [redis]
+
+  analytics-python:
+    build: ../../apps/analytics-python
+    ports: ['8002:8000']
+    depends_on: [postgres]
+
+  workers:
+    build: ../../apps/workers
+    environment:
+      REDIS_URL: redis://redis:6379
+    depends_on: [redis]
+
+  webhook-gateway:
+    build: ../../apps/webhook-gateway
+    environment:
+      REDIS_URL: redis://redis:6379
+    ports: ['3010:3010']
+    depends_on: [redis]
+
+volumes:
+  pgdata: {}
+  miniodata: {}

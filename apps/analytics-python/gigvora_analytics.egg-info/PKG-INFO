@@ -1,0 +1,17 @@
+Metadata-Version: 2.4
+Name: gigvora-analytics
+Version: 0.1.0
+Summary: Gigvora analytics & BI service
+Requires-Python: >=3.11
+Requires-Dist: fastapi>=0.115
+Requires-Dist: uvicorn[standard]>=0.30
+Requires-Dist: pydantic>=2.8
+Requires-Dist: pandas>=2.2
+Requires-Dist: numpy>=2.0
+Requires-Dist: duckdb>=1.1
+Requires-Dist: asyncpg>=0.29
+Requires-Dist: structlog>=24.4
+Requires-Dist: prometheus-client>=0.20
+Provides-Extra: dev
+Requires-Dist: pytest>=8.3; extra == "dev"
+Requires-Dist: ruff>=0.6; extra == "dev"
